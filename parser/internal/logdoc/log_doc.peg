@@ -11,14 +11,14 @@ Doc <- '{'                           { p.PushMap() }
        DocElements?
        '}'                           { p.PopMap() } 
 
-DocElements <- DocElem (',' S? DocElem)*
+DocElements <- DocElem (',' DocElem)*
 DocElem <- S? Field S? Value S?      { p.SetMapValue() }
 
 List <- '['                          { p.PushList() }   
         ListElements?
         ']'                          { p.PopList() }
-ListElements <- ListElem (',' S? ListElem)*
-ListElem <- Value S?                 { p.SetListValue() }
+ListElements <- ListElem (',' ListElem)*
+ListElem <- S? Value S?                 { p.SetListValue() }
 
 Field <- <fieldChar+> ':'            { p.PushField(buffer[begin:end]) }
 Value <- (Doc

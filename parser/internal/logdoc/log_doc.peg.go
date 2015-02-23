@@ -931,16 +931,6 @@ func (p *LogDocParser) Init() {
 								goto l10
 							}
 							position++
-							{
-								position11, tokenIndex11, depth11 := position, tokenIndex, depth
-								if !_rules[ruleS]() {
-									goto l11
-								}
-								goto l12
-							l11:
-								position, tokenIndex, depth = position11, tokenIndex11, depth11
-							}
-						l12:
 							if !_rules[ruleDocElem]() {
 								goto l10
 							}
@@ -971,67 +961,67 @@ func (p *LogDocParser) Init() {
 			position, tokenIndex, depth = position3, tokenIndex3, depth3
 			return false
 		},
-		/* 2 DocElements <- <(DocElem (',' S? DocElem)*)> */
+		/* 2 DocElements <- <(DocElem (',' DocElem)*)> */
 		nil,
 		/* 3 DocElem <- <(S? Field S? Value S? Action2)> */
 		func() bool {
-			position15, tokenIndex15, depth15 := position, tokenIndex, depth
+			position13, tokenIndex13, depth13 := position, tokenIndex, depth
 			{
-				position16 := position
+				position14 := position
 				depth++
 				{
-					position17, tokenIndex17, depth17 := position, tokenIndex, depth
+					position15, tokenIndex15, depth15 := position, tokenIndex, depth
 					if !_rules[ruleS]() {
-						goto l17
+						goto l15
 					}
-					goto l18
-				l17:
-					position, tokenIndex, depth = position17, tokenIndex17, depth17
+					goto l16
+				l15:
+					position, tokenIndex, depth = position15, tokenIndex15, depth15
 				}
-			l18:
+			l16:
 				{
-					position19 := position
+					position17 := position
 					depth++
 					{
-						position20 := position
+						position18 := position
 						depth++
 						{
-							position23 := position
+							position21 := position
 							depth++
 							{
 								switch buffer[position] {
 								case '$', '_':
 									{
-										position25, tokenIndex25, depth25 := position, tokenIndex, depth
+										position23, tokenIndex23, depth23 := position, tokenIndex, depth
 										if buffer[position] != rune('_') {
-											goto l26
+											goto l24
 										}
 										position++
-										goto l25
-									l26:
-										position, tokenIndex, depth = position25, tokenIndex25, depth25
+										goto l23
+									l24:
+										position, tokenIndex, depth = position23, tokenIndex23, depth23
 										if buffer[position] != rune('$') {
-											goto l15
+											goto l13
 										}
 										position++
 									}
-								l25:
+								l23:
 									break
 								case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 									if c := buffer[position]; c < rune('0') || c > rune('9') {
-										goto l15
+										goto l13
 									}
 									position++
 									break
 								case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z':
 									if c := buffer[position]; c < rune('A') || c > rune('Z') {
-										goto l15
+										goto l13
 									}
 									position++
 									break
 								default:
 									if c := buffer[position]; c < rune('a') || c > rune('z') {
-										goto l15
+										goto l13
 									}
 									position++
 									break
@@ -1039,48 +1029,48 @@ func (p *LogDocParser) Init() {
 							}
 
 							depth--
-							add(rulefieldChar, position23)
+							add(rulefieldChar, position21)
 						}
-					l21:
+					l19:
 						{
-							position22, tokenIndex22, depth22 := position, tokenIndex, depth
+							position20, tokenIndex20, depth20 := position, tokenIndex, depth
 							{
-								position27 := position
+								position25 := position
 								depth++
 								{
 									switch buffer[position] {
 									case '$', '_':
 										{
-											position29, tokenIndex29, depth29 := position, tokenIndex, depth
+											position27, tokenIndex27, depth27 := position, tokenIndex, depth
 											if buffer[position] != rune('_') {
-												goto l30
+												goto l28
 											}
 											position++
-											goto l29
-										l30:
-											position, tokenIndex, depth = position29, tokenIndex29, depth29
+											goto l27
+										l28:
+											position, tokenIndex, depth = position27, tokenIndex27, depth27
 											if buffer[position] != rune('$') {
-												goto l22
+												goto l20
 											}
 											position++
 										}
-									l29:
+									l27:
 										break
 									case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 										if c := buffer[position]; c < rune('0') || c > rune('9') {
-											goto l22
+											goto l20
 										}
 										position++
 										break
 									case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z':
 										if c := buffer[position]; c < rune('A') || c > rune('Z') {
-											goto l22
+											goto l20
 										}
 										position++
 										break
 									default:
 										if c := buffer[position]; c < rune('a') || c > rune('z') {
-											goto l22
+											goto l20
 										}
 										position++
 										break
@@ -1088,24 +1078,37 @@ func (p *LogDocParser) Init() {
 								}
 
 								depth--
-								add(rulefieldChar, position27)
+								add(rulefieldChar, position25)
 							}
-							goto l21
-						l22:
-							position, tokenIndex, depth = position22, tokenIndex22, depth22
+							goto l19
+						l20:
+							position, tokenIndex, depth = position20, tokenIndex20, depth20
 						}
 						depth--
-						add(rulePegText, position20)
+						add(rulePegText, position18)
 					}
 					if buffer[position] != rune(':') {
-						goto l15
+						goto l13
 					}
 					position++
 					{
 						add(ruleAction6, position)
 					}
 					depth--
-					add(ruleField, position19)
+					add(ruleField, position17)
+				}
+				{
+					position30, tokenIndex30, depth30 := position, tokenIndex, depth
+					if !_rules[ruleS]() {
+						goto l30
+					}
+					goto l31
+				l30:
+					position, tokenIndex, depth = position30, tokenIndex30, depth30
+				}
+			l31:
+				if !_rules[ruleValue]() {
+					goto l13
 				}
 				{
 					position32, tokenIndex32, depth32 := position, tokenIndex, depth
@@ -1117,42 +1120,39 @@ func (p *LogDocParser) Init() {
 					position, tokenIndex, depth = position32, tokenIndex32, depth32
 				}
 			l33:
-				if !_rules[ruleValue]() {
-					goto l15
-				}
-				{
-					position34, tokenIndex34, depth34 := position, tokenIndex, depth
-					if !_rules[ruleS]() {
-						goto l34
-					}
-					goto l35
-				l34:
-					position, tokenIndex, depth = position34, tokenIndex34, depth34
-				}
-			l35:
 				{
 					add(ruleAction2, position)
 				}
 				depth--
-				add(ruleDocElem, position16)
+				add(ruleDocElem, position14)
 			}
 			return true
-		l15:
-			position, tokenIndex, depth = position15, tokenIndex15, depth15
+		l13:
+			position, tokenIndex, depth = position13, tokenIndex13, depth13
 			return false
 		},
 		/* 4 List <- <('[' Action3 ListElements? ']' Action4)> */
 		nil,
-		/* 5 ListElements <- <(ListElem (',' S? ListElem)*)> */
+		/* 5 ListElements <- <(ListElem (',' ListElem)*)> */
 		nil,
-		/* 6 ListElem <- <(Value S? Action5)> */
+		/* 6 ListElem <- <(S? Value S? Action5)> */
 		func() bool {
-			position39, tokenIndex39, depth39 := position, tokenIndex, depth
+			position37, tokenIndex37, depth37 := position, tokenIndex, depth
 			{
-				position40 := position
+				position38 := position
 				depth++
+				{
+					position39, tokenIndex39, depth39 := position, tokenIndex, depth
+					if !_rules[ruleS]() {
+						goto l39
+					}
+					goto l40
+				l39:
+					position, tokenIndex, depth = position39, tokenIndex39, depth39
+				}
+			l40:
 				if !_rules[ruleValue]() {
-					goto l39
+					goto l37
 				}
 				{
 					position41, tokenIndex41, depth41 := position, tokenIndex, depth
@@ -1168,11 +1168,11 @@ func (p *LogDocParser) Init() {
 					add(ruleAction5, position)
 				}
 				depth--
-				add(ruleListElem, position40)
+				add(ruleListElem, position38)
 			}
 			return true
-		l39:
-			position, tokenIndex, depth = position39, tokenIndex39, depth39
+		l37:
+			position, tokenIndex, depth = position37, tokenIndex37, depth37
 			return false
 		},
 		/* 7 Field <- <(<fieldChar+> ':' Action6)> */
@@ -2089,16 +2089,6 @@ func (p *LogDocParser) Init() {
 												goto l136
 											}
 											position++
-											{
-												position137, tokenIndex137, depth137 := position, tokenIndex, depth
-												if !_rules[ruleS]() {
-													goto l137
-												}
-												goto l138
-											l137:
-												position, tokenIndex, depth = position137, tokenIndex137, depth137
-											}
-										l138:
 											if !_rules[ruleListElem]() {
 												goto l136
 											}
@@ -2132,67 +2122,67 @@ func (p *LogDocParser) Init() {
 							break
 						default:
 							{
-								position140 := position
+								position138 := position
 								depth++
 								{
-									position141 := position
+									position139 := position
 									depth++
 									{
-										position142, tokenIndex142, depth142 := position, tokenIndex, depth
+										position140, tokenIndex140, depth140 := position, tokenIndex, depth
 										if buffer[position] != rune('-') {
-											goto l142
+											goto l140
 										}
 										position++
-										goto l143
-									l142:
-										position, tokenIndex, depth = position142, tokenIndex142, depth142
+										goto l141
+									l140:
+										position, tokenIndex, depth = position140, tokenIndex140, depth140
 									}
-								l143:
+								l141:
 									if c := buffer[position]; c < rune('0') || c > rune('9') {
 										goto l45
 									}
 									position++
-								l144:
+								l142:
 									{
-										position145, tokenIndex145, depth145 := position, tokenIndex, depth
+										position143, tokenIndex143, depth143 := position, tokenIndex, depth
 										if c := buffer[position]; c < rune('0') || c > rune('9') {
-											goto l145
+											goto l143
 										}
 										position++
-										goto l144
-									l145:
-										position, tokenIndex, depth = position145, tokenIndex145, depth145
+										goto l142
+									l143:
+										position, tokenIndex, depth = position143, tokenIndex143, depth143
 									}
 									{
-										position146, tokenIndex146, depth146 := position, tokenIndex, depth
+										position144, tokenIndex144, depth144 := position, tokenIndex, depth
 										if buffer[position] != rune('.') {
-											goto l146
+											goto l144
 										}
 										position++
-										goto l147
-									l146:
-										position, tokenIndex, depth = position146, tokenIndex146, depth146
+										goto l145
+									l144:
+										position, tokenIndex, depth = position144, tokenIndex144, depth144
 									}
-								l147:
-								l148:
+								l145:
+								l146:
 									{
-										position149, tokenIndex149, depth149 := position, tokenIndex, depth
+										position147, tokenIndex147, depth147 := position, tokenIndex, depth
 										if c := buffer[position]; c < rune('0') || c > rune('9') {
-											goto l149
+											goto l147
 										}
 										position++
-										goto l148
-									l149:
-										position, tokenIndex, depth = position149, tokenIndex149, depth149
+										goto l146
+									l147:
+										position, tokenIndex, depth = position147, tokenIndex147, depth147
 									}
 									depth--
-									add(rulePegText, position141)
+									add(rulePegText, position139)
 								}
 								{
 									add(ruleAction7, position)
 								}
 								depth--
-								add(ruleNumeric, position140)
+								add(ruleNumeric, position138)
 							}
 							break
 						}
@@ -2250,20 +2240,20 @@ func (p *LogDocParser) Init() {
 		nil,
 		/* 29 S <- <' '> */
 		func() bool {
-			position171, tokenIndex171, depth171 := position, tokenIndex, depth
+			position169, tokenIndex169, depth169 := position, tokenIndex, depth
 			{
-				position172 := position
+				position170 := position
 				depth++
 				if buffer[position] != rune(' ') {
-					goto l171
+					goto l169
 				}
 				position++
 				depth--
-				add(ruleS, position172)
+				add(ruleS, position170)
 			}
 			return true
-		l171:
-			position, tokenIndex, depth = position171, tokenIndex171, depth171
+		l169:
+			position, tokenIndex, depth = position169, tokenIndex169, depth169
 			return false
 		},
 		/* 31 Action0 <- <{ p.PushMap() }> */
