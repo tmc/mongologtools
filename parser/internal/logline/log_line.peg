@@ -1,0 +1,139 @@
+# PE Grammar for MongoDB log lines
+#
+# Attempts to cover mongo 2.4 -> 3.0 line formats
+# 
+# The primary aim is to correctly parse queries and ops in a slow query log
+#
+package logline
+
+type logLineParser Peg {
+  logLine
+}
+
+MongoLogLine <- Timestamp ' '
+                Thread ' '
+                Op ' '
+                NS ' '
+                LineField*
+                Locks?
+                LineField*
+                Duration?
+                extra !.
+
+Timestamp <- timestamp24 / timestamp26
+
+# the mongo thread field for the log line
+Thread <- '[' <letterOrDigit+> ']'          { p.SetField("thread", buffer[begin:end]) }
+
+# the op field
+Op <- <'query'
+      /'insert'
+      /'update'
+      /'remove'
+      /'getmore'
+      /'command'>                        { p.SetField("op", buffer[begin:end]) }
+
+# a field is a a key value pair in a mongo log line
+LineField <- (commandFieldName
+         / plainFieldName ) S? LineValue S?    { p.EndField() }
+
+NS <- <nsChar+> { p.SetField("ns", buffer[begin:end]) }
+Locks <- 'locks(micros)' S? lock*
+lock <- [[rw]] [:] [0-9]+ S?
+Duration <- <[0-9]+>'ms' { p.SetField("duration_ms", buffer[begin:end]) }
+
+# for 2.4 field names are plainFieldName, 2.6 augmented the command op type and it includes a commandType now
+plainFieldName <- <fieldChar+> ':'      { p.StartField(buffer[begin:end]) }
+commandFieldName <- 'command: ' <fieldChar+> { p.SetField("commandType", buffer[begin:end]); p.StartField("command") }
+LineValue <- S? (Doc / Numeric / String)
+
+# 2.4 rules
+timestamp24 <- <date ' ' time> { p.SetField("timestamp", buffer[begin:end]) }
+
+# 2.6 rules
+timestamp26 <- <datetime26> { p.SetField("timestamp", buffer[begin:end]) }
+datetime26 <- digit4 [-] digit2 [-] digit2 [T] time tz?
+
+
+# helper rules
+digit4 <- [0-9][0-9][0-9][0-9]
+digit2 <- [0-9][0-9]
+date <- day ' ' month ' ' dayNum
+tz <- [+] [0-9]+
+time <- hour ':' minute ':' second '.' millisecond
+day <- [A-Z][a-z][a-z]
+month <- [A-Z][a-z][a-z]
+dayNum <- digit2?
+hour <- digit2 
+minute <- digit2
+second <- digit2
+millisecond <- [0-9][0-9][0-9]
+
+letterOrDigit <- [a-z] / [A-Z] / [0-9] / [_$]
+nsChar <- [A-z0-9-.:$]
+
+# this is simply a parser helper to consume any unconsumed line content remaining
+extra <- <.*> { p.SetField("xextra", buffer[begin:end]) }
+
+S <- ' '+
+
+########################################################################################
+# this is a literal import from github.com/tmc/mongologtools/internal/logdoc/log_doc.peg
+########################################################################################
+Doc <- '{'                           { p.PushMap() }   
+       DocElements?
+       '}'                           { p.PopMap() } 
+
+DocElements <- DocElem (',' DocElem)*
+DocElem <- S? Field S? Value S?      { p.SetMapValue() }
+
+List <- '['                          { p.PushList() }   
+        ListElements?
+        ']'                          { p.PopList() }
+ListElements <- ListElem (',' ListElem)*
+ListElem <- S? Value S?                 { p.SetListValue() }
+
+Field <- <fieldChar+> ':'            { p.PushField(buffer[begin:end]) }
+Value <- (Doc
+        / List
+        / Numeric
+        / Boolean
+        / String
+        / Null
+        / ObjectID
+        / Date
+        / BinData
+        / TimestampVal # 'Val' appened to avoid collision
+        / Regex
+        / NumberLong
+        / Undefined
+        / MinKey
+        / MaxKey
+        )
+
+Numeric <- <'-'? [0-9]+ '.'? [0-9]*>      { p.PushValue(p.Numeric(buffer[begin:end])) }
+Boolean <- True / False
+String <- ["] <stringChar*> ["]      { p.PushValue(buffer[begin:end]) }
+Null <- 'null'                       { p.PushValue(nil) }
+True <- 'true'                       { p.PushValue(true) }
+False <- 'false'                     { p.PushValue(false) }
+Date <- 'new '? 'Date(' <[0-9]+> ')' { p.PushValue(p.Date(buffer[begin:end])) }
+ObjectID <- 'ObjectId("'
+            <hexChar*>
+            '")'                     { p.PushValue(p.ObjectId(buffer[begin:end])) }
+BinData <- 'BinData(' <[^)]+> ')'    { p.PushValue(p.Bindata(buffer[begin:end])) }
+Regex <- '/' <regexBody>             { p.PushValue(p.Regex(buffer[begin:end])) }
+TimestampVal <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
+NumberLong <- 'NumberLong(' <[^)]+> ')' { p.PushValue(p.Numberlong(buffer[begin:end])) }
+MinKey <- 'MinKey'                   { p.PushValue(p.Minkey()) }
+MaxKey <- 'MaxKey'                   { p.PushValue(p.Maxkey()) }
+Undefined <- 'undefined'             { p.PushValue(p.Undefined()) }
+
+hexChar <- [0-9] / [[a-f]]
+regexChar <- [^/]
+regexBody <- regexChar+ '/' [gims]*
+stringChar <- [^"\\] / '\\' ["\\]
+fieldChar <- [[a-z]] / [0-9] / [_$]
+########################################################################################
+# end imported section
+########################################################################################
