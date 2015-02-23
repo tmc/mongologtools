@@ -1,0 +1,67 @@
+# PE Grammer for the custom log line representation MongoDB uses for its log lines
+package logdoc
+
+type logDocParser Peg {
+    logDoc
+}
+
+LogDoc <- Doc !.
+
+Doc <- '{'                           { p.pushMap() }   
+       DocElements?
+       '}'                           { p.popMap() } 
+
+DocElements <- DocElem (',' S? DocElem)*
+DocElem <- S? Field S? Value S?      { p.setMapValue() }
+
+List <- '['                          { p.pushList() }   
+        ListElements?
+        ']'                          { p.popList() }
+ListElements <- ListElem (',' S? ListElem)*
+ListElem <- Value S?                 { p.setListValue() }
+
+Field <- <fieldChar+> ':'            { p.pushField(buffer[begin:end]) }
+Value <- (Doc
+        / List
+        / Numeric
+        / Boolean
+        / String
+        / Null
+        / ObjectID
+        / Date
+        / BinData
+        / Timestamp
+        / Regex
+        / NumberLong
+        / Undefined
+        / MinKey
+        / MaxKey
+        )
+
+
+Numeric <- <[0-9]+ '.'? [0-9]*>      { p.pushValue(numeric(buffer[begin:end])) }
+Boolean <- True / False
+String <- ["] <stringChar*> ["]      { p.pushValue(buffer[begin:end]) }
+Null <- 'null'                       { p.pushValue(nil) }
+True <- 'true'                       { p.pushValue(true) }
+False <- 'false'                     { p.pushValue(false) }
+Date <- 'new '? 'Date(' <[0-9]+> ')' { p.pushValue(date(buffer[begin:end])) }
+ObjectID <- 'ObjectId("'
+            <hexChar*>
+            '")'                     { p.pushValue(objectid(buffer[begin:end])) }
+BinData <- 'BinData(' <[^)]+> ')'    { p.pushValue(bindata(buffer[begin:end])) }
+Timestamp <- 'Timestamp(' <[^)]+> ')' { p.pushValue(timestamp(buffer[begin:end])) }
+Regex <- '/' <regexBody>             { p.pushValue(regex(buffer[begin:end])) }
+NumberLong <- 'NumberLong(' <[^)]+> ')'  { p.pushValue(numberlong(buffer[begin:end])) }
+MinKey <- 'MinKey'                   { p.pushValue(minkey()) }
+MaxKey <- 'MaxKey'                   { p.pushValue(maxkey()) }
+Undefined <- 'undefined'             { p.pushValue(undefined()) }w
+
+hexChar <- [0-9] / [[a-f]]
+regexChar <- [^/]
+regexBody <- regexChar+ '/' [gims]*
+stringChar <- [^"\\] / '\\' ["\\]
+fieldChar <- [[a-z]] / [0-9] / [_$]
+
+#remainder <- <.+>                    { p.setRemainder(buffer[begin:end]) }
+S <- ' '
