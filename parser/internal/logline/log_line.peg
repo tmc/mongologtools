@@ -18,7 +18,7 @@ MongoLogLine <- Timestamp ' '
                 Locks?
                 LineField*
                 Duration?
-                extra !.
+                extra? !.
 
 Timestamp <- timestamp24 / timestamp26
 
@@ -73,7 +73,7 @@ letterOrDigit <- [a-z] / [A-Z] / [0-9] / [_$]
 nsChar <- [A-z0-9-.:$]
 
 # this is simply a parser helper to consume any unconsumed line content remaining
-extra <- <.*> { p.SetField("xextra", buffer[begin:end]) }
+extra <- <.+> { p.SetField("xextra", buffer[begin:end]) }
 
 S <- ' '+
 
