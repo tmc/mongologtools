@@ -770,47 +770,47 @@ func (p *LogDocParser) Execute() {
 		case rulePegText:
 			begin, end = int(token.begin), int(token.end)
 		case ruleAction0:
-			p.pushMap()
+			p.PushMap()
 		case ruleAction1:
-			p.popMap()
+			p.PopMap()
 		case ruleAction2:
-			p.setMapValue()
+			p.SetMapValue()
 		case ruleAction3:
-			p.pushList()
+			p.PushList()
 		case ruleAction4:
-			p.popList()
+			p.PopList()
 		case ruleAction5:
-			p.setListValue()
+			p.SetListValue()
 		case ruleAction6:
-			p.pushField(buffer[begin:end])
+			p.PushField(buffer[begin:end])
 		case ruleAction7:
-			p.pushValue(numeric(buffer[begin:end]))
+			p.PushValue(p.Numeric(buffer[begin:end]))
 		case ruleAction8:
-			p.pushValue(buffer[begin:end])
+			p.PushValue(buffer[begin:end])
 		case ruleAction9:
-			p.pushValue(nil)
+			p.PushValue(nil)
 		case ruleAction10:
-			p.pushValue(true)
+			p.PushValue(true)
 		case ruleAction11:
-			p.pushValue(false)
+			p.PushValue(false)
 		case ruleAction12:
-			p.pushValue(date(buffer[begin:end]))
+			p.PushValue(p.Date(buffer[begin:end]))
 		case ruleAction13:
-			p.pushValue(objectid(buffer[begin:end]))
+			p.PushValue(p.ObjectId(buffer[begin:end]))
 		case ruleAction14:
-			p.pushValue(bindata(buffer[begin:end]))
+			p.PushValue(p.Bindata(buffer[begin:end]))
 		case ruleAction15:
-			p.pushValue(regex(buffer[begin:end]))
+			p.PushValue(p.Regex(buffer[begin:end]))
 		case ruleAction16:
-			p.pushValue(timestamp(buffer[begin:end]))
+			p.PushValue(p.Timestamp(buffer[begin:end]))
 		case ruleAction17:
-			p.pushValue(numberlong(buffer[begin:end]))
+			p.PushValue(p.Numberlong(buffer[begin:end]))
 		case ruleAction18:
-			p.pushValue(minkey())
+			p.PushValue(p.Minkey())
 		case ruleAction19:
-			p.pushValue(maxkey())
+			p.PushValue(p.Maxkey())
 		case ruleAction20:
-			p.pushValue(undefined())
+			p.PushValue(p.Undefined())
 
 		}
 	}
@@ -1177,7 +1177,7 @@ func (p *LogDocParser) Init() {
 		},
 		/* 7 Field <- <(<fieldChar+> ':' Action6)> */
 		nil,
-		/* 8 Value <- <(Null / MinKey / ((&('M') MaxKey) | (&('u') Undefined) | (&('N') NumberLong) | (&('/') Regex) | (&('T') Timestamp) | (&('B') BinData) | (&('D' | 'n') Date) | (&('O') ObjectID) | (&('"') String) | (&('f' | 't') Boolean) | (&('[') List) | (&('{') Doc) | (&('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') Numeric)))> */
+		/* 8 Value <- <(Null / MinKey / ((&('M') MaxKey) | (&('u') Undefined) | (&('N') NumberLong) | (&('/') Regex) | (&('T') Timestamp) | (&('B') BinData) | (&('D' | 'n') Date) | (&('O') ObjectID) | (&('"') String) | (&('f' | 't') Boolean) | (&('[') List) | (&('{') Doc) | (&('-' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') Numeric)))> */
 		func() bool {
 			position45, tokenIndex45, depth45 := position, tokenIndex, depth
 			{
@@ -2137,42 +2137,53 @@ func (p *LogDocParser) Init() {
 								{
 									position141 := position
 									depth++
+									{
+										position142, tokenIndex142, depth142 := position, tokenIndex, depth
+										if buffer[position] != rune('-') {
+											goto l142
+										}
+										position++
+										goto l143
+									l142:
+										position, tokenIndex, depth = position142, tokenIndex142, depth142
+									}
+								l143:
 									if c := buffer[position]; c < rune('0') || c > rune('9') {
 										goto l45
 									}
 									position++
-								l142:
+								l144:
 									{
-										position143, tokenIndex143, depth143 := position, tokenIndex, depth
+										position145, tokenIndex145, depth145 := position, tokenIndex, depth
 										if c := buffer[position]; c < rune('0') || c > rune('9') {
-											goto l143
+											goto l145
 										}
 										position++
-										goto l142
-									l143:
-										position, tokenIndex, depth = position143, tokenIndex143, depth143
+										goto l144
+									l145:
+										position, tokenIndex, depth = position145, tokenIndex145, depth145
 									}
 									{
-										position144, tokenIndex144, depth144 := position, tokenIndex, depth
+										position146, tokenIndex146, depth146 := position, tokenIndex, depth
 										if buffer[position] != rune('.') {
-											goto l144
+											goto l146
 										}
 										position++
-										goto l145
-									l144:
-										position, tokenIndex, depth = position144, tokenIndex144, depth144
+										goto l147
+									l146:
+										position, tokenIndex, depth = position146, tokenIndex146, depth146
 									}
-								l145:
-								l146:
+								l147:
+								l148:
 									{
-										position147, tokenIndex147, depth147 := position, tokenIndex, depth
+										position149, tokenIndex149, depth149 := position, tokenIndex, depth
 										if c := buffer[position]; c < rune('0') || c > rune('9') {
-											goto l147
+											goto l149
 										}
 										position++
-										goto l146
-									l147:
-										position, tokenIndex, depth = position147, tokenIndex147, depth147
+										goto l148
+									l149:
+										position, tokenIndex, depth = position149, tokenIndex149, depth149
 									}
 									depth--
 									add(rulePegText, position141)
@@ -2197,7 +2208,7 @@ func (p *LogDocParser) Init() {
 			position, tokenIndex, depth = position45, tokenIndex45, depth45
 			return false
 		},
-		/* 9 Numeric <- <(<([0-9]+ '.'? [0-9]*)> Action7)> */
+		/* 9 Numeric <- <(<('-'? [0-9]+ '.'? [0-9]*)> Action7)> */
 		nil,
 		/* 10 Boolean <- <(True / False)> */
 		nil,
@@ -2239,64 +2250,64 @@ func (p *LogDocParser) Init() {
 		nil,
 		/* 29 S <- <' '> */
 		func() bool {
-			position169, tokenIndex169, depth169 := position, tokenIndex, depth
+			position171, tokenIndex171, depth171 := position, tokenIndex, depth
 			{
-				position170 := position
+				position172 := position
 				depth++
 				if buffer[position] != rune(' ') {
-					goto l169
+					goto l171
 				}
 				position++
 				depth--
-				add(ruleS, position170)
+				add(ruleS, position172)
 			}
 			return true
-		l169:
-			position, tokenIndex, depth = position169, tokenIndex169, depth169
+		l171:
+			position, tokenIndex, depth = position171, tokenIndex171, depth171
 			return false
 		},
-		/* 31 Action0 <- <{ p.pushMap() }> */
+		/* 31 Action0 <- <{ p.PushMap() }> */
 		nil,
-		/* 32 Action1 <- <{ p.popMap() }> */
+		/* 32 Action1 <- <{ p.PopMap() }> */
 		nil,
-		/* 33 Action2 <- <{ p.setMapValue() }> */
+		/* 33 Action2 <- <{ p.SetMapValue() }> */
 		nil,
-		/* 34 Action3 <- <{ p.pushList() }> */
+		/* 34 Action3 <- <{ p.PushList() }> */
 		nil,
-		/* 35 Action4 <- <{ p.popList() }> */
+		/* 35 Action4 <- <{ p.PopList() }> */
 		nil,
-		/* 36 Action5 <- <{ p.setListValue() }> */
+		/* 36 Action5 <- <{ p.SetListValue() }> */
 		nil,
 		nil,
-		/* 38 Action6 <- <{ p.pushField(buffer[begin:end]) }> */
+		/* 38 Action6 <- <{ p.PushField(buffer[begin:end]) }> */
 		nil,
-		/* 39 Action7 <- <{ p.pushValue(numeric(buffer[begin:end])) }> */
+		/* 39 Action7 <- <{ p.PushValue(p.Numeric(buffer[begin:end])) }> */
 		nil,
-		/* 40 Action8 <- <{ p.pushValue(buffer[begin:end]) }> */
+		/* 40 Action8 <- <{ p.PushValue(buffer[begin:end]) }> */
 		nil,
-		/* 41 Action9 <- <{ p.pushValue(nil) }> */
+		/* 41 Action9 <- <{ p.PushValue(nil) }> */
 		nil,
-		/* 42 Action10 <- <{ p.pushValue(true) }> */
+		/* 42 Action10 <- <{ p.PushValue(true) }> */
 		nil,
-		/* 43 Action11 <- <{ p.pushValue(false) }> */
+		/* 43 Action11 <- <{ p.PushValue(false) }> */
 		nil,
-		/* 44 Action12 <- <{ p.pushValue(date(buffer[begin:end])) }> */
+		/* 44 Action12 <- <{ p.PushValue(p.Date(buffer[begin:end])) }> */
 		nil,
-		/* 45 Action13 <- <{ p.pushValue(objectid(buffer[begin:end])) }> */
+		/* 45 Action13 <- <{ p.PushValue(p.ObjectId(buffer[begin:end])) }> */
 		nil,
-		/* 46 Action14 <- <{ p.pushValue(bindata(buffer[begin:end])) }> */
+		/* 46 Action14 <- <{ p.PushValue(p.Bindata(buffer[begin:end])) }> */
 		nil,
-		/* 47 Action15 <- <{ p.pushValue(regex(buffer[begin:end])) }> */
+		/* 47 Action15 <- <{ p.PushValue(p.Regex(buffer[begin:end])) }> */
 		nil,
-		/* 48 Action16 <- <{ p.pushValue(timestamp(buffer[begin:end])) }> */
+		/* 48 Action16 <- <{ p.PushValue(p.Timestamp(buffer[begin:end])) }> */
 		nil,
-		/* 49 Action17 <- <{ p.pushValue(numberlong(buffer[begin:end])) }> */
+		/* 49 Action17 <- <{ p.PushValue(p.Numberlong(buffer[begin:end])) }> */
 		nil,
-		/* 50 Action18 <- <{ p.pushValue(minkey()) }> */
+		/* 50 Action18 <- <{ p.PushValue(p.Minkey()) }> */
 		nil,
-		/* 51 Action19 <- <{ p.pushValue(maxkey()) }> */
+		/* 51 Action19 <- <{ p.PushValue(p.Maxkey()) }> */
 		nil,
-		/* 52 Action20 <- <{ p.pushValue(undefined()) }> */
+		/* 52 Action20 <- <{ p.PushValue(p.Undefined()) }> */
 		nil,
 	}
 	p.rules = _rules

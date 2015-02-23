@@ -9,7 +9,7 @@ import (
 
 func TestLogDocParser(t *testing.T) {
 	cases := []struct{ input, expected string }{
-		{`{ foo: 42 }`, `{"foo":42}`},
+		{`{ foo: [42] }`, `{"foo":[42]}`},
 		{`{ _updated_at: { $lte: new Date(1412941647719) } }`, `{"_updated_at":{"$lte":{"$date":"2014-10-10T11:47:27.719Z"}}}`},
 		{`{ _id: ObjectId("54e792daf1845f045f4c000e"), data: BinData(0,"aGVsbG8K") }`, `{"_id":{"$oid":"54e792daf1845f045f4c000e"},"data":{"$binary":"aGVsbG8K","$type":"00"}}`},
 		{`{ t: Timestamp(1420000000, 1) }`, `{"t":{"$timestamp":{"t":1420000000,"i":1}}}`},

@@ -8,7 +8,7 @@ import (
 	mongo_json "github.com/mongodb/mongo-tools/common/json"
 )
 
-func numeric(value string) interface{} {
+func (p *LogDoc) Numeric(value string) interface{} {
 	n := json.Number(value)
 	if i64, err := n.Int64(); err == nil {
 		return i64
@@ -17,16 +17,16 @@ func numeric(value string) interface{} {
 	return f64
 }
 
-func date(value string) mongo_json.Date {
+func (d *LogDoc) Date(value string) mongo_json.Date {
 	n, _ := strconv.Atoi(value)
 	return mongo_json.Date(n)
 }
 
-func objectid(value string) mongo_json.ObjectId {
+func (d *LogDoc) ObjectId(value string) mongo_json.ObjectId {
 	return mongo_json.ObjectId(value)
 }
 
-func bindata(value string) mongo_json.BinData {
+func (d *LogDoc) Bindata(value string) mongo_json.BinData {
 	// example: BinData(0,"aGVsbG8K")
 	parts := strings.Split(value, ",")
 	binType, _ := strconv.Atoi(strings.TrimSpace(parts[0]))
@@ -38,7 +38,7 @@ func bindata(value string) mongo_json.BinData {
 
 }
 
-func timestamp(value string) mongo_json.Timestamp {
+func (d *LogDoc) Timestamp(value string) mongo_json.Timestamp {
 	parts := strings.Split(value, ",")
 	if len(parts) != 2 {
 		return mongo_json.Timestamp{}
@@ -52,11 +52,11 @@ func timestamp(value string) mongo_json.Timestamp {
 	}
 }
 
-func numberlong(value string) mongo_json.NumberLong {
+func (d *LogDoc) Numberlong(value string) mongo_json.NumberLong {
 	n, _ := strconv.ParseInt(value, 10, 0)
 	return mongo_json.NumberLong(n)
 }
-func regex(value string) mongo_json.RegExp {
+func (d *LogDoc) Regex(value string) mongo_json.RegExp {
 	slashIdx := strings.LastIndex(value, "/")
 	pattern, options := value[:slashIdx], value[slashIdx+1:]
 	return mongo_json.RegExp{
@@ -65,14 +65,14 @@ func regex(value string) mongo_json.RegExp {
 	}
 }
 
-func minkey() mongo_json.MinKey {
+func (d *LogDoc) Minkey() mongo_json.MinKey {
 	return mongo_json.MinKey{}
 }
 
-func maxkey() mongo_json.MaxKey {
+func (d *LogDoc) Maxkey() mongo_json.MaxKey {
 	return mongo_json.MaxKey{}
 }
 
-func undefined() mongo_json.Undefined {
+func (d *LogDoc) Undefined() mongo_json.Undefined {
 	return mongo_json.Undefined{}
 }

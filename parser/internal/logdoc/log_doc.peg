@@ -7,20 +7,20 @@ type LogDocParser Peg {
 
 LogDoc <- Doc !.
 
-Doc <- '{'                           { p.pushMap() }   
+Doc <- '{'                           { p.PushMap() }   
        DocElements?
-       '}'                           { p.popMap() } 
+       '}'                           { p.PopMap() } 
 
 DocElements <- DocElem (',' S? DocElem)*
-DocElem <- S? Field S? Value S?      { p.setMapValue() }
+DocElem <- S? Field S? Value S?      { p.SetMapValue() }
 
-List <- '['                          { p.pushList() }   
+List <- '['                          { p.PushList() }   
         ListElements?
-        ']'                          { p.popList() }
+        ']'                          { p.PopList() }
 ListElements <- ListElem (',' S? ListElem)*
-ListElem <- Value S?                 { p.setListValue() }
+ListElem <- Value S?                 { p.SetListValue() }
 
-Field <- <fieldChar+> ':'            { p.pushField(buffer[begin:end]) }
+Field <- <fieldChar+> ':'            { p.PushField(buffer[begin:end]) }
 Value <- (Doc
         / List
         / Numeric
@@ -38,24 +38,23 @@ Value <- (Doc
         / MaxKey
         )
 
-
-Numeric <- <[0-9]+ '.'? [0-9]*>      { p.pushValue(numeric(buffer[begin:end])) }
+Numeric <- <'-'? [0-9]+ '.'? [0-9]*>      { p.PushValue(p.Numeric(buffer[begin:end])) }
 Boolean <- True / False
-String <- ["] <stringChar*> ["]      { p.pushValue(buffer[begin:end]) }
-Null <- 'null'                       { p.pushValue(nil) }
-True <- 'true'                       { p.pushValue(true) }
-False <- 'false'                     { p.pushValue(false) }
-Date <- 'new '? 'Date(' <[0-9]+> ')' { p.pushValue(date(buffer[begin:end])) }
+String <- ["] <stringChar*> ["]      { p.PushValue(buffer[begin:end]) }
+Null <- 'null'                       { p.PushValue(nil) }
+True <- 'true'                       { p.PushValue(true) }
+False <- 'false'                     { p.PushValue(false) }
+Date <- 'new '? 'Date(' <[0-9]+> ')' { p.PushValue(p.Date(buffer[begin:end])) }
 ObjectID <- 'ObjectId("'
             <hexChar*>
-            '")'                     { p.pushValue(objectid(buffer[begin:end])) }
-BinData <- 'BinData(' <[^)]+> ')'    { p.pushValue(bindata(buffer[begin:end])) }
-Regex <- '/' <regexBody>             { p.pushValue(regex(buffer[begin:end])) }
-Timestamp <- 'Timestamp(' <[^)]+> ')' { p.pushValue(timestamp(buffer[begin:end])) }
-NumberLong <- 'NumberLong(' <[^)]+> ')' { p.pushValue(numberlong(buffer[begin:end])) }
-MinKey <- 'MinKey'                   { p.pushValue(minkey()) }
-MaxKey <- 'MaxKey'                   { p.pushValue(maxkey()) }
-Undefined <- 'undefined'             { p.pushValue(undefined()) }
+            '")'                     { p.PushValue(p.ObjectId(buffer[begin:end])) }
+BinData <- 'BinData(' <[^)]+> ')'    { p.PushValue(p.Bindata(buffer[begin:end])) }
+Regex <- '/' <regexBody>             { p.PushValue(p.Regex(buffer[begin:end])) }
+Timestamp <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
+NumberLong <- 'NumberLong(' <[^)]+> ')' { p.PushValue(p.Numberlong(buffer[begin:end])) }
+MinKey <- 'MinKey'                   { p.PushValue(p.Minkey()) }
+MaxKey <- 'MaxKey'                   { p.PushValue(p.Maxkey()) }
+Undefined <- 'undefined'             { p.PushValue(p.Undefined()) }
 
 hexChar <- [0-9] / [[a-f]]
 regexChar <- [^/]
