@@ -50,12 +50,12 @@ ObjectID <- 'ObjectId("'
             <hexChar*>
             '")'                     { p.pushValue(objectid(buffer[begin:end])) }
 BinData <- 'BinData(' <[^)]+> ')'    { p.pushValue(bindata(buffer[begin:end])) }
-Timestamp <- 'Timestamp(' <[^)]+> ')' { p.pushValue(timestamp(buffer[begin:end])) }
 Regex <- '/' <regexBody>             { p.pushValue(regex(buffer[begin:end])) }
-NumberLong <- 'NumberLong(' <[^)]+> ')'  { p.pushValue(numberlong(buffer[begin:end])) }
+Timestamp <- 'Timestamp(' <[^)]+> ')' { p.pushValue(timestamp(buffer[begin:end])) }
+NumberLong <- 'NumberLong(' <[^)]+> ')' { p.pushValue(numberlong(buffer[begin:end])) }
 MinKey <- 'MinKey'                   { p.pushValue(minkey()) }
 MaxKey <- 'MaxKey'                   { p.pushValue(maxkey()) }
-Undefined <- 'undefined'             { p.pushValue(undefined()) }w
+Undefined <- 'undefined'             { p.pushValue(undefined()) }
 
 hexChar <- [0-9] / [[a-f]]
 regexChar <- [^/]
@@ -63,5 +63,4 @@ regexBody <- regexChar+ '/' [gims]*
 stringChar <- [^"\\] / '\\' ["\\]
 fieldChar <- [[a-z]] / [0-9] / [_$]
 
-#remainder <- <.+>                    { p.setRemainder(buffer[begin:end]) }
 S <- ' '
