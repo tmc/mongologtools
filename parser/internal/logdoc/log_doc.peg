@@ -1,8 +1,8 @@
 # PE Grammer for the custom log line representation MongoDB uses for its log lines
 package logdoc
 
-type logDocParser Peg {
-    logDoc
+type LogDocParser Peg {
+    LogDoc
 }
 
 LogDoc <- Doc !.

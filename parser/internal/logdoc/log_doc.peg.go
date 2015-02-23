@@ -689,8 +689,8 @@ func (t *tokens32) Expand(index int) tokenTree {
 	return nil
 }
 
-type logDocParser struct {
-	logDoc
+type LogDocParser struct {
+	LogDoc
 
 	Buffer string
 	buffer []rune
@@ -732,7 +732,7 @@ search:
 }
 
 type parseError struct {
-	p *logDocParser
+	p *LogDocParser
 }
 
 func (e *parseError) Error() string {
@@ -755,15 +755,15 @@ func (e *parseError) Error() string {
 	return error
 }
 
-func (p *logDocParser) PrintSyntaxTree() {
+func (p *LogDocParser) PrintSyntaxTree() {
 	p.tokenTree.PrintSyntaxTree(p.Buffer)
 }
 
-func (p *logDocParser) Highlighter() {
+func (p *LogDocParser) Highlighter() {
 	p.tokenTree.PrintSyntax()
 }
 
-func (p *logDocParser) Execute() {
+func (p *LogDocParser) Execute() {
 	buffer, begin, end := p.Buffer, 0, 0
 	for token := range p.tokenTree.Tokens() {
 		switch token.pegRule {
@@ -816,7 +816,7 @@ func (p *logDocParser) Execute() {
 	}
 }
 
-func (p *logDocParser) Init() {
+func (p *LogDocParser) Init() {
 	p.buffer = []rune(p.Buffer)
 	if len(p.buffer) == 0 || p.buffer[len(p.buffer)-1] != end_symbol {
 		p.buffer = append(p.buffer, end_symbol)

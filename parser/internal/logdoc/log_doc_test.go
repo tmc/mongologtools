@@ -1,13 +1,10 @@
-//go:generate peg -inline -switch log_doc.peg
-
 package logdoc_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
-	"github.com/tmc/mongologtools/parser/logdoc"
+	"github.com/tmc/mongologtools/parser/internal/logdoc"
 )
 
 func TestLogDocParser(t *testing.T) {
@@ -33,12 +30,4 @@ func TestLogDocParser(t *testing.T) {
 			t.Errorf("case %d: expected '%s'\nbut got '%s'", i, testcase.expected, result)
 		}
 	}
-}
-
-func ExampleConvertLogToExtended() {
-	doc, _ := logdoc.ConvertLogToExtended([]byte("{ x: Timestamp(13000000, 0)}"))
-	buf, _ := json.Marshal(doc)
-	fmt.Print(string(buf))
-	// output:
-	// {"x":{"$timestamp":{"t":13000000,"i":0}}}
 }
