@@ -47,8 +47,10 @@ LineField <- (commandField
 
 NS <- <nsChar+> ' ' { p.SetField("ns", buffer[begin:end]) }
 Locks <- 'locks(micros)' S? lock*
-lock <- [[rw]] [:] [0-9]+ S?
-Duration <- <[0-9]+>'ms' { p.SetField("duration_ms", buffer[begin:end]) }
+lock <- <[[rw]]>                   { p.StartField(buffer[begin:end]) }
+        ':' Numeric S?             { p.EndField() }
+
+Duration <- <[0-9]+>'ms'                    { p.SetField("duration_ms", buffer[begin:end]) }
 
 
 plainField <- <fieldChar+> ':' S? { p.StartField(buffer[begin:end]) }
@@ -116,7 +118,7 @@ List <- '['                          { p.PushList() }
         ListElements?
         ']'                          { p.PopList() }
 ListElements <- ListElem (',' ListElem)*
-ListElem <- S? Value S?                 { p.SetListValue() }
+ListElem <- S? Value S?              { p.SetListValue() }
 
 Field <- <fieldChar+> ':'            { p.PushField(buffer[begin:end]) }
 Value <- (Doc
@@ -136,7 +138,7 @@ Value <- (Doc
         / MaxKey
         )
 
-Numeric <- <'-'? [0-9]+ '.'? [0-9]*>      { p.PushValue(p.Numeric(buffer[begin:end])) }
+Numeric <- <'-'? [0-9]+ '.'? [0-9]*> { p.PushValue(p.Numeric(buffer[begin:end])) }
 Boolean <- True / False
 String <- ["] <stringChar*> ["]      { p.PushValue(buffer[begin:end]) }
 Null <- 'null'                       { p.PushValue(nil) }
