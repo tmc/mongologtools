@@ -17,8 +17,8 @@ const (
 	ruleMongoLogLine
 	ruleTimestamp
 	ruleLogLevel
-	ruleSubsystem
-	ruleThread
+	ruleComponent
+	ruleContext
 	ruleOp
 	ruleLineField
 	ruleNS
@@ -133,8 +133,8 @@ var rul3s = [...]string{
 	"MongoLogLine",
 	"Timestamp",
 	"LogLevel",
-	"Subsystem",
-	"Thread",
+	"Component",
+	"Context",
 	"Op",
 	"LineField",
 	"NS",
@@ -884,9 +884,9 @@ func (p *logLineParser) Execute() {
 		case ruleAction0:
 			p.SetField("log_level", buffer[begin:end])
 		case ruleAction1:
-			p.SetField("subsystem", buffer[begin:end])
+			p.SetField("component", buffer[begin:end])
 		case ruleAction2:
-			p.SetField("thread", buffer[begin:end])
+			p.SetField("context", buffer[begin:end])
 		case ruleAction3:
 			p.SetField("op", buffer[begin:end])
 		case ruleAction4:
@@ -1035,7 +1035,7 @@ func (p *logLineParser) Init() {
 
 	_rules = [...]func() bool{
 		nil,
-		/* 0 MongoLogLine <- <(Timestamp LogLevel? Subsystem? Thread Op NS LineField* Locks? LineField* Duration? extra? !.)> */
+		/* 0 MongoLogLine <- <(Timestamp LogLevel? Component? Context Op NS LineField* Locks? LineField* Duration? extra? !.)> */
 		func() bool {
 			position0, tokenIndex0, depth0 := position, tokenIndex, depth
 			{
@@ -1334,7 +1334,7 @@ func (p *logLineParser) Init() {
 							add(ruleAction1, position)
 						}
 						depth--
-						add(ruleSubsystem, position35)
+						add(ruleComponent, position35)
 					}
 					goto l34
 				l33:
@@ -1465,7 +1465,7 @@ func (p *logLineParser) Init() {
 						add(ruleAction2, position)
 					}
 					depth--
-					add(ruleThread, position42)
+					add(ruleContext, position42)
 				}
 				{
 					position55 := position
@@ -2043,9 +2043,9 @@ func (p *logLineParser) Init() {
 		nil,
 		/* 2 LogLevel <- <(<('I' / 'D')> ' ' Action0)> */
 		nil,
-		/* 3 Subsystem <- <(<[A-Z]+> ' '+ Action1)> */
+		/* 3 Component <- <(<[A-Z]+> ' '+ Action1)> */
 		nil,
-		/* 4 Thread <- <('[' <letterOrDigit+> ']' ' ' Action2)> */
+		/* 4 Context <- <('[' <letterOrDigit+> ']' ' ' Action2)> */
 		nil,
 		/* 5 Op <- <(<((&('c') ('c' 'o' 'm' 'm' 'a' 'n' 'd')) | (&('g') ('g' 'e' 't' 'm' 'o' 'r' 'e')) | (&('r') ('r' 'e' 'm' 'o' 'v' 'e')) | (&('u') ('u' 'p' 'd' 'a' 't' 'e')) | (&('i') ('i' 'n' 's' 'e' 'r' 't')) | (&('q') ('q' 'u' 'e' 'r' 'y')))> ' ' Action3)> */
 		nil,
@@ -4846,9 +4846,9 @@ func (p *logLineParser) Init() {
 		nil,
 		/* 68 Action0 <- <{ p.SetField("log_level", buffer[begin:end]) }> */
 		nil,
-		/* 69 Action1 <- <{ p.SetField("subsystem", buffer[begin:end]) }> */
+		/* 69 Action1 <- <{ p.SetField("component", buffer[begin:end]) }> */
 		nil,
-		/* 70 Action2 <- <{ p.SetField("thread", buffer[begin:end]) }> */
+		/* 70 Action2 <- <{ p.SetField("context", buffer[begin:end]) }> */
 		nil,
 		/* 71 Action3 <- <{ p.SetField("op", buffer[begin:end]) }> */
 		nil,
