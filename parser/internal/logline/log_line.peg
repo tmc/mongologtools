@@ -35,7 +35,9 @@ Op <- <'query'
 
 # a field is a a key value pair in a mongo log line
 LineField <- (commandFieldName
-         / plainFieldName ) S? LineValue S?    { p.EndField() }
+             / planSummaryField
+             / plainFieldName
+             ) S? LineValue S?              { p.EndField() }
 
 NS <- <nsChar+> ' ' { p.SetField("ns", buffer[begin:end]) }
 Locks <- 'locks(micros)' S? lock*
@@ -45,6 +47,9 @@ Duration <- <[0-9]+>'ms' { p.SetField("duration_ms", buffer[begin:end]) }
 # for 2.4 field names are plainFieldName, 2.6 augmented the command op type and it includes a commandType now
 plainFieldName <- <fieldChar+> ':'      { p.StartField(buffer[begin:end]) }
 commandFieldName <- 'command: ' <fieldChar+> { p.SetField("commandType", buffer[begin:end]); p.StartField("command") }
+planSummaryField <- 'planSummary: ' <fieldChar+> { p.SetField("planSummaryType", buffer[begin:end]); p.StartField("planSummary") }
+
+
 LineValue <- S? (Doc / Numeric / String)
 
 # 2.4 rules
