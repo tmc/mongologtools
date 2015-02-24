@@ -34,23 +34,37 @@ Op <- <'query'
       /'command'> ' '                       { p.SetField("op", buffer[begin:end]) }
 
 # a field is a a key value pair in a mongo log line
-LineField <- (commandFieldName
-             / planSummaryField
-             / plainFieldName
-             ) S? LineValue S?              { p.EndField() }
+LineField <- (commandField
+            / planSummaryField
+            / plainField
+            ) S?
 
 NS <- <nsChar+> ' ' { p.SetField("ns", buffer[begin:end]) }
 Locks <- 'locks(micros)' S? lock*
 lock <- [[rw]] [:] [0-9]+ S?
 Duration <- <[0-9]+>'ms' { p.SetField("duration_ms", buffer[begin:end]) }
 
-# for 2.4 field names are plainFieldName, 2.6 augmented the command op type and it includes a commandType now
-plainFieldName <- <fieldChar+> ':'      { p.StartField(buffer[begin:end]) }
-commandFieldName <- 'command: ' <fieldChar+> { p.SetField("commandType", buffer[begin:end]); p.StartField("command") }
-planSummaryField <- 'planSummary: ' <fieldChar+> { p.SetField("planSummaryType", buffer[begin:end]); p.StartField("planSummary") }
 
+plainField <- <fieldChar+> ':' S? { p.StartField(buffer[begin:end]) }
+              LineValue           { p.EndField() }
 
-LineValue <- S? (Doc / Numeric / String)
+commandField <- 'command: ' <fieldChar+> { p.SetField("commandType", buffer[begin:end]); p.StartField("command") }
+                LineValue         { p.EndField() }
+
+planSummaryField <- 'planSummary: ' { p.StartField("planSummary"); p.PushList() }
+                    planSummaryElements     { p.EndField()}
+
+planSummaryElements <- planSummaryElem (', ' planSummaryElem)*
+planSummaryElem <- <planSummaryStage> { p.PushMap(); p.PushField(buffer[begin:end]) }
+                   planSummary
+
+planSummaryStage <- 'AND_HASH' / 'AND_SORTED' / 'CACHED_PLAN' / 'COLLSCAN' / 'COUNT' / 'COUNT_SCAN' / 'DELETE' / 'DISTINCT' / 'EOF' / 'FETCH' / 'GEO_NEAR_2D' / 'GEO_NEAR_2DSPHERE' / 'GROUP' / 'IDHACK' / 'IXSCAN' / 'KEEP_MUTATIONS' / 'LIMIT' / 'SORT_MERGE' / 'MULTI_PLAN' / 'OR' / 'PROJECTION' / 'QUEUED_DATA' / 'SHARDING_FILTER' / 'SKIP' / 'SORT' / 'SUBPLAN' / 'TEXT' / 'UPDATE' # as of 9d0714cd
+
+planSummary <- (' ' LineValue { p.SetMapValue(); p.SetListValue() }
+               / { p.PushValue(1); p.SetMapValue(); p.SetListValue() }
+               )
+
+LineValue <- (Doc / Numeric) S?
 
 # 2.4 rules
 timestamp24 <- <date ' ' time> { p.SetField("timestamp", buffer[begin:end]) }
