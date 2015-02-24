@@ -11,6 +11,8 @@ type logLineParser Peg {
 }
 
 MongoLogLine <- Timestamp
+                LogLevel?
+                Subsystem?
                 Thread
                 Op
                 NS
@@ -21,6 +23,10 @@ MongoLogLine <- Timestamp
                 extra? !.
 
 Timestamp <- (timestamp24 / timestamp26) S?
+
+# 3.0 fields
+LogLevel <- <[ID]> ' '                      { p.SetField("log_level", buffer[begin:end]) }
+Subsystem <- <[A-Z]+> ' '+                  { p.SetField("subsystem", buffer[begin:end]) }
 
 # the mongo thread field for the log line
 Thread <- '[' <letterOrDigit+> ']' ' '      { p.SetField("thread", buffer[begin:end]) }
