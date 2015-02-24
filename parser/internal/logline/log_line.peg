@@ -32,12 +32,7 @@ Component <- <[A-Z]+> ' '+                  { p.SetField("component", buffer[beg
 Context <- '[' <letterOrDigit+> ']' ' '      { p.SetField("context", buffer[begin:end]) }
 
 # the op field
-Op <- <'query'
-      /'insert'
-      /'update'
-      /'remove'
-      /'getmore'
-      /'command'> ' '                       { p.SetField("op", buffer[begin:end]) }
+Op <- <[[a-z]]+> ' '                        { p.SetField("op", buffer[begin:end]) }
 
 # a field is a a key value pair in a mongo log line
 LineField <- (commandField
@@ -45,7 +40,7 @@ LineField <- (commandField
             / plainField
             ) S?
 
-NS <- <nsChar+> ' ' { p.SetField("ns", buffer[begin:end]) }
+NS <- <nsChar*> ' ' { p.SetField("ns", buffer[begin:end]) }
 Locks <- 'locks(micros)' S? lock*
 lock <- <[[rw]]>                   { p.StartField(buffer[begin:end]) }
         ':' Numeric S?             { p.EndField() }
@@ -85,12 +80,12 @@ datetime26 <- digit4 [-] digit2 [-] digit2 [T] time tz?
 # helper rules
 digit4 <- [0-9][0-9][0-9][0-9]
 digit2 <- [0-9][0-9]
-date <- day ' ' month ' ' dayNum
+date <- day ' ' month ' '+ dayNum
 tz <- [+] [0-9]+
 time <- hour ':' minute ':' second '.' millisecond
 day <- [A-Z][a-z][a-z]
 month <- [A-Z][a-z][a-z]
-dayNum <- digit2?
+dayNum <- [0-9][0-9]?
 hour <- digit2 
 minute <- digit2
 second <- digit2
