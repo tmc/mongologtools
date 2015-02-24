@@ -14,6 +14,7 @@ MongoLogLine <- Timestamp
                 LogLevel?
                 Component?
                 Context
+                Warning?
                 Op
                 NS
                 LineField*
@@ -29,10 +30,16 @@ LogLevel <- <[ID]> ' '                      { p.SetField("log_level", buffer[beg
 Component <- <[A-Z]+> ' '+                  { p.SetField("component", buffer[begin:end]) }
 
 # the mongo context field for the log line
-Context <- '[' <letterOrDigit+> ']' ' '      { p.SetField("context", buffer[begin:end]) }
+Context <- '[' <letterOrDigit+> ']' ' '     { p.SetField("context", buffer[begin:end]) }
 
 # the op field
 Op <- <[[a-z]]+> ' '                        { p.SetField("op", buffer[begin:end]) }
+
+
+Warning <- <loglineSizeWarning> ' '         { p.SetField("warning", buffer[begin:end]) }
+
+loglineSizeWarning <- 'warning: log line attempted (' [0-9]+ 'k) over max size (' [0-9]+ 'k), printing beginning and end ...'
+
 
 # a field is a a key value pair in a mongo log line
 LineField <- (commandField
