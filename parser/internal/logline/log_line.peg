@@ -58,7 +58,7 @@ Duration <- <[0-9]+>'ms'                    { p.SetField("duration_ms", buffer[b
 plainField <- <fieldChar+> ':' S? { p.StartField(buffer[begin:end]) }
               LineValue           { p.EndField() }
 
-commandField <- 'command: ' <fieldChar+> { p.SetField("commandType", buffer[begin:end]); p.StartField("command") }
+commandField <- 'command: ' <fieldChar+> S? { p.SetField("command_type", buffer[begin:end]); p.StartField("command") }
                 LineValue         { p.EndField() }
 
 planSummaryField <- 'planSummary: ' { p.StartField("planSummary"); p.PushList() }
