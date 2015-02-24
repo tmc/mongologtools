@@ -30,7 +30,7 @@ Value <- (Doc
         / ObjectID
         / Date
         / BinData
-        / Timestamp
+        / TimestampVal
         / Regex
         / NumberLong
         / Undefined
@@ -50,7 +50,7 @@ ObjectID <- 'ObjectId("'
             '")'                     { p.PushValue(p.ObjectId(buffer[begin:end])) }
 BinData <- 'BinData(' <[^)]+> ')'    { p.PushValue(p.Bindata(buffer[begin:end])) }
 Regex <- '/' <regexBody>             { p.PushValue(p.Regex(buffer[begin:end])) }
-Timestamp <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
+TimestampVal <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
 NumberLong <- 'NumberLong(' <[^)]+> ')' { p.PushValue(p.Numberlong(buffer[begin:end])) }
 MinKey <- 'MinKey'                   { p.PushValue(p.Minkey()) }
 MaxKey <- 'MaxKey'                   { p.PushValue(p.Maxkey()) }
@@ -60,6 +60,6 @@ hexChar <- [0-9] / [[a-f]]
 regexChar <- [^/]
 regexBody <- regexChar+ '/' [gims]*
 stringChar <- [^"\\] / '\\' ["\\]
-fieldChar <- [[a-z]] / [0-9] / [_$]
+fieldChar <- [[a-z]] / [0-9] / [_$.*]
 
 S <- ' '

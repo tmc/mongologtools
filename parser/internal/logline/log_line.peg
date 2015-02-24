@@ -10,20 +10,20 @@ type logLineParser Peg {
   logLine
 }
 
-MongoLogLine <- Timestamp ' '
-                Thread ' '
-                Op ' '
-                NS ' '
+MongoLogLine <- Timestamp
+                Thread
+                Op
+                NS
                 LineField*
                 Locks?
                 LineField*
                 Duration?
                 extra? !.
 
-Timestamp <- timestamp24 / timestamp26
+Timestamp <- (timestamp24 / timestamp26) S?
 
 # the mongo thread field for the log line
-Thread <- '[' <letterOrDigit+> ']'          { p.SetField("thread", buffer[begin:end]) }
+Thread <- '[' <letterOrDigit+> ']' ' '      { p.SetField("thread", buffer[begin:end]) }
 
 # the op field
 Op <- <'query'
@@ -31,13 +31,13 @@ Op <- <'query'
       /'update'
       /'remove'
       /'getmore'
-      /'command'>                        { p.SetField("op", buffer[begin:end]) }
+      /'command'> ' '                       { p.SetField("op", buffer[begin:end]) }
 
 # a field is a a key value pair in a mongo log line
 LineField <- (commandFieldName
          / plainFieldName ) S? LineValue S?    { p.EndField() }
 
-NS <- <nsChar+> { p.SetField("ns", buffer[begin:end]) }
+NS <- <nsChar+> ' ' { p.SetField("ns", buffer[begin:end]) }
 Locks <- 'locks(micros)' S? lock*
 lock <- [[rw]] [:] [0-9]+ S?
 Duration <- <[0-9]+>'ms' { p.SetField("duration_ms", buffer[begin:end]) }
@@ -103,7 +103,7 @@ Value <- (Doc
         / ObjectID
         / Date
         / BinData
-        / TimestampVal # 'Val' appened to avoid collision
+        / TimestampVal
         / Regex
         / NumberLong
         / Undefined
@@ -133,7 +133,7 @@ hexChar <- [0-9] / [[a-f]]
 regexChar <- [^/]
 regexBody <- regexChar+ '/' [gims]*
 stringChar <- [^"\\] / '\\' ["\\]
-fieldChar <- [[a-z]] / [0-9] / [_$]
+fieldChar <- [[a-z]] / [0-9] / [_$.*]
 ########################################################################################
 # end imported section
 ########################################################################################
