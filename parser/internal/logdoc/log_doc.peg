@@ -44,7 +44,7 @@ String <- ["] <stringChar*> ["]      { p.PushValue(buffer[begin:end]) }
 Null <- 'null'                       { p.PushValue(nil) }
 True <- 'true'                       { p.PushValue(true) }
 False <- 'false'                     { p.PushValue(false) }
-Date <- 'new '? 'Date(' <[0-9]+> ')' { p.PushValue(p.Date(buffer[begin:end])) }
+Date <- 'new '? 'Date(' '-'? <[0-9]+> ')' { p.PushValue(p.Date(buffer[begin:end])) }
 ObjectID <- 'ObjectId(' ['"]
             <hexChar*>
             ['"] ')'                 { p.PushValue(p.ObjectId(buffer[begin:end])) }
