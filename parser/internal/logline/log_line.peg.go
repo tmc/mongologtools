@@ -4890,21 +4890,9 @@ func (p *logLineParser) Init() {
 													goto l344
 												}
 												position++
-												{
-													position351, tokenIndex351, depth351 := position, tokenIndex, depth
-													if buffer[position] != rune('"') {
-														goto l352
-													}
-													position++
-													goto l351
-												l352:
-													position, tokenIndex, depth = position351, tokenIndex351, depth351
-													if buffer[position] != rune('\\') {
-														goto l344
-													}
-													position++
+												if !matchDot() {
+													goto l344
 												}
-											l351:
 											}
 										l346:
 											depth--
@@ -4930,40 +4918,40 @@ func (p *logLineParser) Init() {
 							break
 						case 'f', 't':
 							{
-								position354 := position
+								position352 := position
 								depth++
 								{
-									position355, tokenIndex355, depth355 := position, tokenIndex, depth
+									position353, tokenIndex353, depth353 := position, tokenIndex, depth
 									{
-										position357 := position
+										position355 := position
 										depth++
 										if buffer[position] != rune('t') {
-											goto l356
+											goto l354
 										}
 										position++
 										if buffer[position] != rune('r') {
-											goto l356
+											goto l354
 										}
 										position++
 										if buffer[position] != rune('u') {
-											goto l356
+											goto l354
 										}
 										position++
 										if buffer[position] != rune('e') {
-											goto l356
+											goto l354
 										}
 										position++
 										{
 											add(ruleAction31, position)
 										}
 										depth--
-										add(ruleTrue, position357)
+										add(ruleTrue, position355)
 									}
-									goto l355
-								l356:
-									position, tokenIndex, depth = position355, tokenIndex355, depth355
+									goto l353
+								l354:
+									position, tokenIndex, depth = position353, tokenIndex353, depth353
 									{
-										position359 := position
+										position357 := position
 										depth++
 										if buffer[position] != rune('f') {
 											goto l260
@@ -4989,17 +4977,17 @@ func (p *logLineParser) Init() {
 											add(ruleAction32, position)
 										}
 										depth--
-										add(ruleFalse, position359)
+										add(ruleFalse, position357)
 									}
 								}
-							l355:
+							l353:
 								depth--
-								add(ruleBoolean, position354)
+								add(ruleBoolean, position352)
 							}
 							break
 						case '[':
 							{
-								position361 := position
+								position359 := position
 								depth++
 								if buffer[position] != rune('[') {
 									goto l260
@@ -5009,35 +4997,35 @@ func (p *logLineParser) Init() {
 									add(ruleAction24, position)
 								}
 								{
-									position363, tokenIndex363, depth363 := position, tokenIndex, depth
+									position361, tokenIndex361, depth361 := position, tokenIndex, depth
 									{
-										position365 := position
+										position363 := position
 										depth++
 										if !_rules[ruleListElem]() {
-											goto l363
+											goto l361
 										}
-									l366:
+									l364:
 										{
-											position367, tokenIndex367, depth367 := position, tokenIndex, depth
+											position365, tokenIndex365, depth365 := position, tokenIndex, depth
 											if buffer[position] != rune(',') {
-												goto l367
+												goto l365
 											}
 											position++
 											if !_rules[ruleListElem]() {
-												goto l367
+												goto l365
 											}
-											goto l366
-										l367:
-											position, tokenIndex, depth = position367, tokenIndex367, depth367
+											goto l364
+										l365:
+											position, tokenIndex, depth = position365, tokenIndex365, depth365
 										}
 										depth--
-										add(ruleListElements, position365)
+										add(ruleListElements, position363)
 									}
-									goto l364
-								l363:
-									position, tokenIndex, depth = position363, tokenIndex363, depth363
+									goto l362
+								l361:
+									position, tokenIndex, depth = position361, tokenIndex361, depth361
 								}
-							l364:
+							l362:
 								if buffer[position] != rune(']') {
 									goto l260
 								}
@@ -5046,7 +5034,7 @@ func (p *logLineParser) Init() {
 									add(ruleAction25, position)
 								}
 								depth--
-								add(ruleList, position361)
+								add(ruleList, position359)
 							}
 							break
 						case '{':
@@ -5074,73 +5062,73 @@ func (p *logLineParser) Init() {
 		},
 		/* 48 Numeric <- <(<('-'? [0-9]+ '.'? [0-9]*)> Action28)> */
 		func() bool {
-			position369, tokenIndex369, depth369 := position, tokenIndex, depth
+			position367, tokenIndex367, depth367 := position, tokenIndex, depth
 			{
-				position370 := position
+				position368 := position
 				depth++
 				{
-					position371 := position
+					position369 := position
 					depth++
 					{
-						position372, tokenIndex372, depth372 := position, tokenIndex, depth
+						position370, tokenIndex370, depth370 := position, tokenIndex, depth
 						if buffer[position] != rune('-') {
-							goto l372
+							goto l370
 						}
 						position++
-						goto l373
-					l372:
-						position, tokenIndex, depth = position372, tokenIndex372, depth372
+						goto l371
+					l370:
+						position, tokenIndex, depth = position370, tokenIndex370, depth370
 					}
-				l373:
+				l371:
 					if c := buffer[position]; c < rune('0') || c > rune('9') {
-						goto l369
+						goto l367
 					}
 					position++
-				l374:
+				l372:
 					{
-						position375, tokenIndex375, depth375 := position, tokenIndex, depth
+						position373, tokenIndex373, depth373 := position, tokenIndex, depth
 						if c := buffer[position]; c < rune('0') || c > rune('9') {
-							goto l375
+							goto l373
 						}
 						position++
-						goto l374
-					l375:
-						position, tokenIndex, depth = position375, tokenIndex375, depth375
+						goto l372
+					l373:
+						position, tokenIndex, depth = position373, tokenIndex373, depth373
 					}
 					{
-						position376, tokenIndex376, depth376 := position, tokenIndex, depth
+						position374, tokenIndex374, depth374 := position, tokenIndex, depth
 						if buffer[position] != rune('.') {
-							goto l376
+							goto l374
 						}
 						position++
-						goto l377
-					l376:
-						position, tokenIndex, depth = position376, tokenIndex376, depth376
+						goto l375
+					l374:
+						position, tokenIndex, depth = position374, tokenIndex374, depth374
 					}
-				l377:
-				l378:
+				l375:
+				l376:
 					{
-						position379, tokenIndex379, depth379 := position, tokenIndex, depth
+						position377, tokenIndex377, depth377 := position, tokenIndex, depth
 						if c := buffer[position]; c < rune('0') || c > rune('9') {
-							goto l379
+							goto l377
 						}
 						position++
-						goto l378
-					l379:
-						position, tokenIndex, depth = position379, tokenIndex379, depth379
+						goto l376
+					l377:
+						position, tokenIndex, depth = position377, tokenIndex377, depth377
 					}
 					depth--
-					add(rulePegText, position371)
+					add(rulePegText, position369)
 				}
 				{
 					add(ruleAction28, position)
 				}
 				depth--
-				add(ruleNumeric, position370)
+				add(ruleNumeric, position368)
 			}
 			return true
-		l369:
-			position, tokenIndex, depth = position369, tokenIndex369, depth369
+		l367:
+			position, tokenIndex, depth = position367, tokenIndex367, depth367
 			return false
 		},
 		/* 49 Boolean <- <(True / False)> */
@@ -5181,13 +5169,13 @@ func (p *logLineParser) Init() {
 		nil,
 		/* 67 regexBody <- <(regexChar+ '/' ((&('s') 's') | (&('m') 'm') | (&('i') 'i') | (&('g') 'g'))*)> */
 		nil,
-		/* 68 stringChar <- <((!('"' / '\\') .) / ('\\' ('"' / '\\')))> */
+		/* 68 stringChar <- <((!('"' / '\\') .) / ('\\' .))> */
 		nil,
 		/* 69 fieldChar <- <((&('$' | '*' | '.' | '_') ((&('*') '*') | (&('.') '.') | (&('$') '$') | (&('_') '_'))) | (&('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') [0-9]) | (&('A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z') [A-Z]) | (&('a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z') [a-z]))> */
 		func() bool {
-			position401, tokenIndex401, depth401 := position, tokenIndex, depth
+			position399, tokenIndex399, depth399 := position, tokenIndex, depth
 			{
-				position402 := position
+				position400 := position
 				depth++
 				{
 					switch buffer[position] {
@@ -5196,25 +5184,25 @@ func (p *logLineParser) Init() {
 							switch buffer[position] {
 							case '*':
 								if buffer[position] != rune('*') {
-									goto l401
+									goto l399
 								}
 								position++
 								break
 							case '.':
 								if buffer[position] != rune('.') {
-									goto l401
+									goto l399
 								}
 								position++
 								break
 							case '$':
 								if buffer[position] != rune('$') {
-									goto l401
+									goto l399
 								}
 								position++
 								break
 							default:
 								if buffer[position] != rune('_') {
-									goto l401
+									goto l399
 								}
 								position++
 								break
@@ -5224,19 +5212,19 @@ func (p *logLineParser) Init() {
 						break
 					case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 						if c := buffer[position]; c < rune('0') || c > rune('9') {
-							goto l401
+							goto l399
 						}
 						position++
 						break
 					case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z':
 						if c := buffer[position]; c < rune('A') || c > rune('Z') {
-							goto l401
+							goto l399
 						}
 						position++
 						break
 					default:
 						if c := buffer[position]; c < rune('a') || c > rune('z') {
-							goto l401
+							goto l399
 						}
 						position++
 						break
@@ -5244,11 +5232,11 @@ func (p *logLineParser) Init() {
 				}
 
 				depth--
-				add(rulefieldChar, position402)
+				add(rulefieldChar, position400)
 			}
 			return true
-		l401:
-			position, tokenIndex, depth = position401, tokenIndex401, depth401
+		l399:
+			position, tokenIndex, depth = position399, tokenIndex399, depth399
 			return false
 		},
 		nil,

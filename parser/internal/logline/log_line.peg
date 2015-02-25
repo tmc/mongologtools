@@ -165,7 +165,7 @@ Undefined <- 'undefined'             { p.PushValue(p.Undefined()) }
 hexChar <- [0-9] / [[a-f]]
 regexChar <- [^/]
 regexBody <- regexChar+ '/' [gims]*
-stringChar <- [^"\\] / '\\' ["\\]
+stringChar <- [^"\\] / '\\' .
 fieldChar <- [[a-z]] / [0-9] / [_$.*]
 ########################################################################################
 # end imported section
