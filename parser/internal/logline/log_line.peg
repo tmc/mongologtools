@@ -21,6 +21,7 @@ MongoLogLine <- Timestamp
                 Locks?
                 LineField*
                 Duration?
+                S? LineField*
                 extra? !.
 
 Timestamp <- (timestamp24 / timestamp26) S?
