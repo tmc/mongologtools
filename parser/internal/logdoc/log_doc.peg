@@ -45,12 +45,15 @@ Null <- 'null'                       { p.PushValue(nil) }
 True <- 'true'                       { p.PushValue(true) }
 False <- 'false'                     { p.PushValue(false) }
 Date <- 'new '? 'Date(' <[0-9]+> ')' { p.PushValue(p.Date(buffer[begin:end])) }
-ObjectID <- 'ObjectId("'
+ObjectID <- 'ObjectId(' ['"]
             <hexChar*>
-            '")'                     { p.PushValue(p.ObjectId(buffer[begin:end])) }
+            ['"] ')'                 { p.PushValue(p.ObjectId(buffer[begin:end])) }
 BinData <- 'BinData(' <[^)]+> ')'    { p.PushValue(p.Bindata(buffer[begin:end])) }
 Regex <- '/' <regexBody>             { p.PushValue(p.Regex(buffer[begin:end])) }
-TimestampVal <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
+TimestampVal <-  (timestampParen
+                / timestampPipe)
+timestampParen <- 'Timestamp(' <[^)]+> ')' { p.PushValue(p.Timestamp(buffer[begin:end])) }
+timestampPipe <- 'Timestamp ' <([0-9] / '|')+>  { p.PushValue(p.Timestamp(buffer[begin:end])) }
 NumberLong <- 'NumberLong(' <[^)]+> ')' { p.PushValue(p.Numberlong(buffer[begin:end])) }
 MinKey <- 'MinKey'                   { p.PushValue(p.Minkey()) }
 MaxKey <- 'MaxKey'                   { p.PushValue(p.Maxkey()) }

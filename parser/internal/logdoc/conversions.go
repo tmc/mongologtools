@@ -41,6 +41,9 @@ func (d *LogDoc) Bindata(value string) mongo_json.BinData {
 func (d *LogDoc) Timestamp(value string) mongo_json.Timestamp {
 	parts := strings.Split(value, ",")
 	if len(parts) != 2 {
+		parts = strings.Split(value, "|")
+	}
+	if len(parts) != 2 {
 		return mongo_json.Timestamp{}
 	}
 	p1, p2 := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
