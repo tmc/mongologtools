@@ -10,7 +10,8 @@ type logLineParser Peg {
   logLine
 }
 
-MongoLogLine <- Timestamp
+MongoLogLine <- LineField?
+                Timestamp
                 LogLevel?
                 Component?
                 Context
@@ -43,7 +44,8 @@ loglineSizeWarning <- 'warning: log line attempted (' [0-9]+ 'k) over max size (
 
 
 # a field is a a key value pair in a mongo log line
-LineField <- (commandField
+LineField <- (exceptionField
+            / commandField
             / planSummaryField
             / plainField
             ) S?
@@ -74,6 +76,9 @@ planSummaryStage <- 'AND_HASH' / 'AND_SORTED' / 'CACHED_PLAN' / 'COLLSCAN' / 'CO
 planSummary <- (' ' LineValue { p.SetMapValue(); p.SetListValue() }
                / { p.PushValue(1); p.SetMapValue(); p.SetListValue() }
                )
+
+exceptionField <- 'exception:'            { p.StartField("exception") }
+                  <(&(. !'code:') .)+> S? { p.PushValue(buffer[begin:end]); p.EndField() }
 
 LineValue <- (Doc / Numeric) S?
 
