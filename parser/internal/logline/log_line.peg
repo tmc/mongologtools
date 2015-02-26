@@ -10,9 +10,9 @@ type logLineParser Peg {
   logLine
 }
 
-MongoLogLine <- LineField?
+MongoLogLine <- LineField? # custom initial field for log line metadata
                 Timestamp
-                LogLevel?
+                Severity?
                 Component?
                 Context
                 Warning?
@@ -22,13 +22,12 @@ MongoLogLine <- LineField?
                 Locks?
                 LineField*
                 Duration?
-                S? LineField*
                 extra? !.
 
 Timestamp <- (timestamp24 / timestamp26) S?
 
 # 3.0 fields
-LogLevel <- <[ID]> ' '                      { p.SetField("log_level", buffer[begin:end]) }
+Severity <- <[ID]> ' '                      { p.SetField("severity", buffer[begin:end]) }
 Component <- <[A-Z]+> ' '+                  { p.SetField("component", buffer[begin:end]) }
 
 # the mongo context field for the log line
