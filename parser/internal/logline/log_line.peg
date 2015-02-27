@@ -27,7 +27,7 @@ MongoLogLine <- LineField? # custom initial field for log line metadata
 Timestamp <- (timestamp24 / timestamp26) S?
 
 # 3.0 fields
-Severity <- <[ID]> ' '                      { p.SetField("severity", buffer[begin:end]) }
+Severity <- <[DIWEF]> ' '                   { p.SetField("severity", buffer[begin:end]) }
 Component <- <[A-Z]+> ' '+                  { p.SetField("component", buffer[begin:end]) }
 
 # the mongo context field for the log line
@@ -79,7 +79,14 @@ planSummary <- (' ' LineValue { p.SetMapValue(); p.SetListValue() }
 exceptionField <- 'exception:'            { p.StartField("exception") }
                   <(&(. !'code:') .)+> S? { p.PushValue(buffer[begin:end]); p.EndField() }
 
-LineValue <- (Doc / Numeric) S?
+LineValue <- (Doc / Numeric / PartialDoc) S?
+
+# if we can't parse a normal document assume we can get a partial one and then consume extra chars up to a new field
+PartialDoc <- <partialDoc> { p.PushValue(buffer[begin:end]) }
+partialDoc <- '{' [^}]+ '}' partialDocExtra*
+partialDocExtra <- &(. !knownField) . # parse until a known field
+# partial list to recover from malformed documents
+knownField <- ('planSummary' / 'ninserted' / 'cursorid' / 'ntoreturn')
 
 # 2.4 rules
 timestamp24 <- <date ' ' time> { p.SetField("timestamp", buffer[begin:end]) }
