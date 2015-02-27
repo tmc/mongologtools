@@ -70,7 +70,7 @@ planSummaryElements <- planSummaryElem (', ' planSummaryElem)*
 planSummaryElem <- <planSummaryStage> { p.PushMap(); p.PushField(buffer[begin:end]) }
                    planSummary
 
-planSummaryStage <- 'AND_HASH' / 'AND_SORTED' / 'CACHED_PLAN' / 'COLLSCAN' / 'COUNT' / 'COUNT_SCAN' / 'DELETE' / 'DISTINCT' / 'EOF' / 'FETCH' / 'GEO_NEAR_2D' / 'GEO_NEAR_2DSPHERE' / 'GROUP' / 'IDHACK' / 'IXSCAN' / 'KEEP_MUTATIONS' / 'LIMIT' / 'SORT_MERGE' / 'MULTI_PLAN' / 'OR' / 'PROJECTION' / 'QUEUED_DATA' / 'SHARDING_FILTER' / 'SKIP' / 'SORT' / 'SUBPLAN' / 'TEXT' / 'UPDATE' # as of 9d0714cd
+planSummaryStage <- ([A-Z] / [_] / [0-9])+
 
 planSummary <- (' ' LineValue { p.SetMapValue(); p.SetListValue() }
                / { p.PushValue(1); p.SetMapValue(); p.SetListValue() }
