@@ -72,9 +72,21 @@ planSummaryElem <- <planSummaryStage> { p.PushMap(); p.PushField(buffer[begin:en
 
 planSummaryStage <- ([A-Z] / [_] / [0-9])+
 
-planSummary <- (' ' LineValue { p.SetMapValue(); p.SetListValue() }
+planSummary <- (' ' OrderedDoc  { p.SetMapValue(); p.SetListValue() }
                / { p.PushValue(1); p.SetMapValue(); p.SetListValue() }
                )
+
+# preserves document order
+OrderedDoc <- '{'                           { p.PushList() }
+              OrderedDocElements?
+              '}'                           { p.PopList() }
+
+OrderedDocElements <- OrderedDocElem (',' OrderedDocElem)*
+OrderedDocElem <- S?       { p.PushMap() }
+                  Field
+                  S?
+                  Value    { p.SetMapValue(); p.SetListValue() }
+                  S?       { p.PopMap() }
 
 exceptionField <- 'exception:'            { p.StartField("exception") }
                   <(&(. !'code:') .)+> S? { p.PushValue(buffer[begin:end]); p.EndField() }
