@@ -20,7 +20,7 @@ func (f *fileio) Writer() (io.Writer, error) {
 	if f.path == "-" {
 		return os.Stdout, nil
 	}
-	return os.OpenFile(f.path, os.O_RDWR|os.O_CREATE, 0660)
+	return os.OpenFile(f.path, os.O_CREATE|os.O_WRONLY, 0660)
 }
 
 func init() {
