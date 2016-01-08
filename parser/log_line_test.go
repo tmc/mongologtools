@@ -13,5 +13,5 @@ func ExampleParseLogLine() {
 	buf, _ := json.Marshal(doc)
 	fmt.Print(string(buf))
 	// output:
-	// {"duration_ms":"0","keyUpdates":0,"nreturned":0,"ns":"local.system.indexes","nscanned":0,"ntoreturn":0,"ntoskip":0,"op":"query","query":{"expireAfterSeconds":{"$exists":true}},"reslen":20,"thread":"TTLMonitor","timestamp":"Mon Feb 23 03:20:19.670"}
+	// {"context":"TTLMonitor","duration_ms":"0","keyUpdates":0,"nreturned":0,"ns":"local.system.indexes","nscanned":0,"ntoreturn":0,"ntoskip":0,"op":"query","query":{"expireAfterSeconds":{"$exists":true}},"r":86,"reslen":20,"timestamp":"Mon Feb 23 03:20:19.670"}
 }
