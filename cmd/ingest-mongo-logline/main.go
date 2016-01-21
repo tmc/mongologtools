@@ -17,7 +17,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "unexpected argument(s):", flag.Args())
 		os.Exit(1)
 	}
-	input, err := Get(*flagInput)
+	input, err := GetIO(*flagInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error configurting input:", err)
 		os.Exit(1)
@@ -28,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	output, err := Get(*flagOutput)
+	output, err := GetIO(*flagOutput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error configurting output:", err)
 		os.Exit(1)

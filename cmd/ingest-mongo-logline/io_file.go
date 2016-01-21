@@ -24,7 +24,7 @@ func (f *fileio) Writer() (io.Writer, error) {
 }
 
 func init() {
-	Register("file", func(path string) IO {
+	RegisterIO("file", func(path string) IO {
 		return &fileio{path: path}
 	})
 }

@@ -26,7 +26,7 @@ func init() {
 	r = registry(map[string]InitIO{})
 }
 
-func Register(scheme string, initFn InitIO) error {
+func RegisterIO(scheme string, initFn InitIO) error {
 	if _, ok := r[scheme]; ok {
 		return ErrAlreadyRegistered
 	}
@@ -34,7 +34,7 @@ func Register(scheme string, initFn InitIO) error {
 	return nil
 }
 
-func Get(source string) (IO, error) {
+func GetIO(source string) (IO, error) {
 	path, err := url.Parse(source)
 	if err != nil {
 		return nil, err
