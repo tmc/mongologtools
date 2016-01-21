@@ -1,29 +1,23 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-
-	"github.com/jessevdk/go-flags"
 )
 
-type Options struct {
-	Verbose []bool `short:"v" long:"verbose" description:"Be verbose"`
-	Input   string `short:"i" long:"input" description:"Input" default:"file://-"`
-	Output  string `short:"o" long:"output" description:"Output" default:"file://-"`
-}
+var (
+	flagInput  = flag.String("i", "file://-", "input io path")
+	flagOutput = flag.String("o", "file://-", "output io path")
+)
 
 func main() {
-	var opts Options
-	args, err := flags.Parse(&opts)
-	if err != nil {
+	flag.Parse()
+	if len(flag.Args()) != 0 {
+		fmt.Fprintf(os.Stderr, "unexpected argument(s):", flag.Args())
 		os.Exit(1)
 	}
-	if len(args) != 0 {
-		fmt.Fprintf(os.Stderr, "unexpected argument(s):", args)
-		os.Exit(1)
-	}
-	input, err := Get(opts.Input)
+	input, err := Get(*flagInput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error configurting input:", err)
 		os.Exit(1)
@@ -34,7 +28,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	output, err := Get(opts.Output)
+	output, err := Get(*flagOutput)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error configurting output:", err)
 		os.Exit(1)
